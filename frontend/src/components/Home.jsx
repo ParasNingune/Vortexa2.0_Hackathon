@@ -22,12 +22,23 @@ export default function Home() {
         </header>
 
         <div className="flex justify-center mt-8 py-4">
+          <div>
           <Link
             to="/predict"
             className="bg-green-700 text-white font-semibold px-6 py-2 rounded-lg shadow hover:bg-green-800 transition"
           >
             Go to Predict Page
           </Link>
+          </div>
+
+          <div className="mx-6">
+          <Link
+            to="/outbreak"
+            className="bg-green-700 text-white font-semibold px-6 py-2 rounded-lg shadow hover:bg-green-800 transition"
+          >
+            Go to Outbreak Visualization Page
+          </Link>
+          </div>
         </div>
 
         <div>

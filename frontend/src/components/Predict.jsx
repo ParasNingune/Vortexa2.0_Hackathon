@@ -158,12 +158,8 @@ export default function Predict() {
             
             {prediction ? (
               <div className="space-y-4">
-                <div className="grid grid-cols-2 gap-4">
-                  <div className="bg-blue-50 p-4 rounded-lg">
-                    <h4 className="font-semibold text-blue-800">Crop Type</h4>
-                    <p className="text-blue-600">{prediction.crop}</p>
-                  </div>
-                  <div className="bg-purple-50 p-4 rounded-lg">
+                <div className="grid grid-cols gap-4">
+                   <div className="bg-purple-50 p-4 rounded-lg flex flex-col items-center justify-center">
                     <h4 className="font-semibold text-purple-800">Disease</h4>
                     <p className="text-purple-600">{prediction.disease}</p>
                   </div>
