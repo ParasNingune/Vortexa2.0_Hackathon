@@ -1,0 +1,51 @@
+[
+{
+"id": "1",
+"name of disease": "Powdery Mildew",
+"image url": "https://i0.wp.com/plantora.app/blog/wp-content/uploads/2023/06/imgonline-com-ua-CompressToSize-BFw9FGTC4bmUMZ.jpg?resize=1536%2C989&ssl=1",
+"disease description": "Powdery mildew is a fungal disease caused by various species of fungi such as Erysiphe and Sphaerotheca. These plant diseases can affect both indoor and outdoor plants. Powdery Mildew can be identified as a white or gray powdery coating on the surfaces of stems, fruits, and leaves of the plant. Powdery mildew can halt photosynthesis and can weaken plant health."
+},
+{
+"id": "2",
+"name of disease": "Leaf Spot",
+"image url": "https://i0.wp.com/plantora.app/blog/wp-content/uploads/2023/06/imgonline-com-ua-CompressToSize-lsr7Ye2WeH.jpg?resize=1536%2C1152&ssl=1",
+"disease description": "Leaf spot is caused by both fungi and bacteria. This plant disease is easy to identify as it exhibits dark or discolored spots on the surface of the leaves often surrounded by a yellow halo. Over time if not treated properly the infected leaves may develop holes and drop prematurely after turning yellow severely affecting the plant’s health."
+},
+
+{
+"id": "3",
+"name of disease": "Mosaic Virus",
+"image url": "https://upload.wikimedia.org/wikipedia/commons/thumb/a/ac/Gurkenmosaikvirus.JPG/500px-Gurkenmosaikvirus.JPG",
+"disease description": "A viral disease that produces a mottled or 'mosaic' pattern on leaves, often accompanied by stunted growth and distorted new leaves. Affects many vegetables and ornamentals."
+},
+{
+"id": "4",
+"name of disease": "Rust",
+"image url": "https://i0.wp.com/plantora.app/blog/wp-content/uploads/2023/06/leaf-rust.webp?w=1088&ssl=1",
+"disease description": "Rust is another plant disease caused by various species of fungi from the Puccinia genus. Plant disease identification for rust is orange, yellow, or reddish-brown pustules on the surface of leaves, fruits, and stems of the plant. These pustules burst and release powdery spores that spread through water and air. Infected plants may show signs of stunted growth, yellowing leaves, premature leaf drop, and an overall decline in plant health."
+},
+{
+"id": "5",
+"name of disease": "Botrytis Blight",
+"image url": "https://i0.wp.com/plantora.app/blog/wp-content/uploads/2023/06/imgonline-com-ua-CompressToSize-2bw4BHFzySAQYEt.jpg?resize=1536%2C864&ssl=1",
+"disease description": "A bacterial infection that causes water-soaked lesions on leaves and stems, which can expand and lead to dieback. Often affects beans and peas."
+},
+{
+"id": "6",
+"name of disease": "Verticillium Wilt",
+"image url": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSXEeXDDt82QeSsZrenayvd9Rr0iKSFOtVQJA&s",
+"disease description": "A fungal disease that enters a plant through its roots and blocks its vascular system, causing one-sided wilting of leaves and branches. Common in trees and shrubs."
+},
+{
+"id": "7",
+"name of disease": "Anthracnose",
+"image url": "https://www.planetnatural.com/wp-content/uploads/2012/12/anthracnose-1.jpg",
+"disease description": "A fungal disease that causes sunken, irregular spots on leaves, fruits, and stems. It can lead to defoliation and severe damage to fruits. Affects various trees and vegetables."
+},
+{
+"id": "8",
+"name of disease": "Downy Mildew",
+"image url": "https://i0.wp.com/plantora.app/blog/wp-content/uploads/2023/06/downy-mildew.jpg?w=1200&ssl=1",
+"disease description": "Downy Mildew is another plant disease caused by several species of fungi including Peronospora and Plasmopara. The plant disease identification of downy mildew includes yellow or purple patches on the upper surface of leaves while the bottom side develops grayish growth. The infected leaves can turn brown, wilt, and eventually die in time."
+}
+]

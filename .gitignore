@@ -2,3 +2,7 @@
 Dataset/
 .ipynb_checkpoints/
 node_modules/
+archive.zip
+Dataset-1
+AI
+trained_plant_disease_model.pkl
