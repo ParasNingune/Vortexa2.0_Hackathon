@@ -6,6 +6,8 @@ from PIL import Image
 import os
 import io
 import base64
+import tensorflow as tf
+from tensorflow import keras
 
 app = Flask(__name__)
 CORS(app, origins=['http://localhost:5173', 'http://localhost:5174', 'http://localhost:5175'])
@@ -42,13 +44,36 @@ def load_pkl_model():
     """Load the pickled model"""
     global model
     try:
+        # First try loading as a pickle file
         with open(model_path, 'rb') as f:
             model = pickle.load(f)
         print(f"✅ Model loaded successfully from {model_path}")
         return True
-    except Exception as e:
-        print(f"❌ Error loading model: {str(e)}")
-        return False
+    except Exception as pickle_error:
+        print(f"❌ Error loading as pickle: {str(pickle_error)}")
+        
+        # If pickle fails, try loading as Keras model
+        try:
+            # Try different Keras loading methods
+            model_h5_path = model_path.replace('.pkl', '.h5')
+            if os.path.exists(model_h5_path):
+                model = keras.models.load_model(model_h5_path)
+                print(f"✅ Keras model loaded from {model_h5_path}")
+                return True
+            
+            # Try loading as SavedModel format
+            model_dir = model_path.replace('.pkl', '_saved_model')
+            if os.path.exists(model_dir):
+                model = keras.models.load_model(model_dir)
+                print(f"✅ SavedModel loaded from {model_dir}")
+                return True
+                
+            print(f"❌ Could not load model in any format")
+            return False
+            
+        except Exception as keras_error:
+            print(f"❌ Error loading as Keras model: {str(keras_error)}")
+            return False
 
 def preprocess_image(image_file, target_size=(128, 128)):
     """Preprocess image for model prediction"""
