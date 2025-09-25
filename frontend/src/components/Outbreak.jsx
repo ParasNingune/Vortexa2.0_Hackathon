@@ -7,6 +7,7 @@ const Outbreak = () => {
   const [outbreakData, setOutbreakData] = useState([]);
   const [filteredData, setFilteredData] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [hoveredCase, setHoveredCase] = useState(null);
   const [dateFilter, setDateFilter] = useState('');
   const [diseaseFilter, setDiseaseFilter] = useState('');
   const [severityFilter, setSeverityFilter] = useState('');
@@ -18,6 +19,7 @@ const Outbreak = () => {
     setLoading(true);
     import('../services/csvOutbreakService.js').then(({ fetchOutbreakDataFromCSV }) => {
       fetchOutbreakDataFromCSV().then(data => {
+        console.log("Data Loaded")
         setOutbreakData(data);
         setFilteredData(data);
         setLoading(false);
@@ -110,94 +112,161 @@ const Outbreak = () => {
     setClimateFilter('');
   };
 
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-green-50 via-emerald-50 to-teal-50">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+          <div className="space-y-8">
+            {/* Header Skeleton */}
+            <div className="text-center">
+              <div className="animate-shimmer h-16 bg-gray-200 rounded-lg mb-4 mx-auto w-96"></div>
+              <div className="animate-shimmer h-6 bg-gray-200 rounded-lg mb-4 mx-auto w-80"></div>
+            </div>
+            
+            {/* Stats Skeleton */}
+            <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
+              {Array.from({ length: 4 }).map((_, i) => (
+                <div key={i} className="bg-white rounded-2xl p-6 shadow-lg">
+                  <div className="animate-shimmer h-4 bg-gray-200 rounded mb-4 w-20"></div>
+                  <div className="animate-shimmer h-8 bg-gray-200 rounded mb-2 w-16"></div>
+                  <div className="animate-shimmer h-3 bg-gray-200 rounded w-24"></div>
+                </div>
+              ))}
+            </div>
+            
+            {/* Map Skeleton */}
+            <div className="bg-white rounded-2xl shadow-lg p-6">
+              <div className="animate-shimmer h-96 bg-gray-200 rounded-lg"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
   return (
-    <div className="min-h-screen bg-gray-50 py-8">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="space-y-6">
-          {/* Header */}
-          <div className="text-center">
-            <h1 className="text-4xl font-bold bg-gradient-to-r from-green-400 to-blue-500 bg-clip-text text-transparent mb-2">
-              Disease Outbreak Dashboard
+    <div className="min-h-screen bg-gradient-to-br from-green-50 via-emerald-50 to-teal-50">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        <div className="space-y-8">
+          {/* Enhanced Header */}
+          <div className="text-center relative">
+            <div className="absolute inset-0 flex items-center justify-center opacity-10">
+              <svg className="w-32 h-32 text-green-500" fill="currentColor" viewBox="0 0 20 20">
+                <path fillRule="evenodd" d="M3 4a1 1 0 011-1h12a1 1 0 011 1v2a1 1 0 01-1 1H4a1 1 0 01-1-1V4zm0 4a1 1 0 011-1h6a1 1 0 011 1v6a1 1 0 01-1 1H4a1 1 0 01-1-1V8zm8 0a1 1 0 011-1h4a1 1 0 011 1v2a1 1 0 01-1 1h-4a1 1 0 01-1-1V8zm0 4a1 1 0 011-1h4a1 1 0 011 1v2a1 1 0 01-1 1h-4a1 1 0 01-1-1v-2z" clipRule="evenodd" />
+              </svg>
+            </div>
+            <h1 className="relative text-5xl md:text-6xl font-bold mb-4">
+              <span className="bg-gradient-to-r from-green-600 via-emerald-600 to-teal-600 bg-clip-text text-transparent">
+                Disease Outbreak
+              </span>
+              <span className="block bg-gradient-to-r from-green-700 to-emerald-700 bg-clip-text text-transparent">
+                Dashboard
+              </span>
             </h1>
-            <p className="text-lg text-gray-600">
-              Real-time monitoring of plant disease outbreaks across regions
+            <p className="text-xl text-gray-600 max-w-3xl mx-auto leading-relaxed">
+              Real-time monitoring and predictive analysis of plant disease outbreaks with 
+              <span className="font-semibold text-green-600"> AI-powered insights</span>
             </p>
+            
+            {/* Status Indicator */}
+            <div className="mt-6 inline-flex items-center space-x-2 bg-green-100 text-green-800 px-4 py-2 rounded-full border border-green-200">
+              <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse"></div>
+              <span className="text-sm font-medium">Live Data • Updated 2 min ago</span>
+            </div>
           </div>
 
-          {/* Statistics Cards */}
+          {/* Enhanced Statistics Cards */}
           <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
-            <div className="bg-white rounded-lg shadow-md p-6">
-              <div className="flex items-center">
+            <div className="group bg-gradient-to-br from-green-50 to-emerald-100 rounded-2xl shadow-lg hover:shadow-2xl border border-green-200 p-6 transition-all duration-300 hover:-translate-y-2">
+              <div className="flex items-center justify-between">
                 <div className="flex-1">
-                  <p className="text-sm font-medium text-gray-500">Total Cases</p>
-                  <p className="text-3xl font-bold text-blue-500">{totalCases}</p>
-                  <p className="text-sm text-gray-500 flex items-center">
-                    <span className="text-green-500 mr-1">↗</span>
+                  <p className="text-sm font-semibold text-green-600 uppercase tracking-wide mb-2">Total Cases</p>
+                  <p className="text-4xl font-bold text-green-700 mb-2">{totalCases.toLocaleString()}</p>
+                  <p className="text-sm text-green-600 flex items-center">
+                    <svg className="w-4 h-4 mr-1 text-emerald-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6" />
+                    </svg>
                     Active outbreaks
                   </p>
                 </div>
-                <FiTrendingUp className="h-8 w-8 text-blue-500" />
+                <div className="w-16 h-16 bg-green-200 rounded-full flex items-center justify-center group-hover:scale-110 transition-transform duration-300">
+                  <FiTrendingUp className="h-8 w-8 text-green-600" />
+                </div>
               </div>
             </div>
 
-            <div className="bg-white rounded-lg shadow-md p-6">
-              <div className="flex items-center">
+            <div className="group bg-gradient-to-br from-red-50 to-pink-100 rounded-2xl shadow-lg hover:shadow-2xl border border-red-200 p-6 transition-all duration-300 hover:-translate-y-2">
+              <div className="flex items-center justify-between">
                 <div className="flex-1">
-                  <p className="text-sm font-medium text-gray-500">High Risk Areas</p>
-                  <p className="text-3xl font-bold text-red-500">{highSeverityCases}</p>
-                  <p className="text-sm text-gray-500 flex items-center">
-                    <FiAlertTriangle className="mr-1" />
+                  <p className="text-sm font-semibold text-red-600 uppercase tracking-wide mb-2">High Risk Areas</p>
+                  <p className="text-4xl font-bold text-red-700 mb-2">{highSeverityCases}</p>
+                  <p className="text-sm text-red-600 flex items-center">
+                    <FiAlertTriangle className="w-4 h-4 mr-1" />
                     Critical zones
                   </p>
                 </div>
-                <FiAlertTriangle className="h-8 w-8 text-red-500" />
+                <div className="w-16 h-16 bg-red-200 rounded-full flex items-center justify-center group-hover:scale-110 transition-transform duration-300">
+                  <FiAlertTriangle className="h-8 w-8 text-red-600" />
+                </div>
               </div>
             </div>
 
-            <div className="bg-white rounded-lg shadow-md p-6">
-              <div className="flex items-center">
+            <div className="group bg-gradient-to-br from-teal-50 to-cyan-100 rounded-2xl shadow-lg hover:shadow-2xl border border-teal-200 p-6 transition-all duration-300 hover:-translate-y-2">
+              <div className="flex items-center justify-between">
                 <div className="flex-1">
-                  <p className="text-sm font-medium text-gray-500">Disease Types</p>
-                  <p className="text-3xl font-bold text-orange-500">{uniqueDiseases}</p>
-                  <p className="text-sm text-gray-500 flex items-center">
-                    <FiTrendingUp className="mr-1" />
+                  <p className="text-sm font-semibold text-teal-600 uppercase tracking-wide mb-2">Disease Types</p>
+                  <p className="text-4xl font-bold text-teal-700 mb-2">{uniqueDiseases}</p>
+                  <p className="text-sm text-teal-600 flex items-center">
+                    <svg className="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
+                    </svg>
                     Different diseases
                   </p>
                 </div>
-                <FiTrendingUp className="h-8 w-8 text-orange-500" />
+                <div className="w-16 h-16 bg-teal-200 rounded-full flex items-center justify-center group-hover:scale-110 transition-transform duration-300">
+                  <svg className="w-8 h-8 text-teal-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
+                  </svg>
+                </div>
               </div>
             </div>
 
-            <div className="bg-white rounded-lg shadow-md p-6">
-              <div className="flex items-center">
+            <div className="group bg-gradient-to-br from-emerald-50 to-green-100 rounded-2xl shadow-lg hover:shadow-2xl border border-emerald-200 p-6 transition-all duration-300 hover:-translate-y-2">
+              <div className="flex items-center justify-between">
                 <div className="flex-1">
-                  <p className="text-sm font-medium text-gray-500">High Risk Spread</p>
-                  <p className="text-3xl font-bold text-purple-500">{highRiskSpreadZones}</p>
-                  <p className="text-sm text-gray-500 flex items-center">
-                    <FiMapPin className="mr-1" />
+                  <p className="text-sm font-semibold text-emerald-600 uppercase tracking-wide mb-2">High Risk Spread</p>
+                  <p className="text-4xl font-bold text-emerald-700 mb-2">{highRiskSpreadZones}</p>
+                  <p className="text-sm text-emerald-600 flex items-center">
+                    <FiMapPin className="w-4 h-4 mr-1" />
                     Spread zones
                   </p>
                 </div>
-                <FiMapPin className="h-8 w-8 text-purple-500" />
+                <div className="w-16 h-16 bg-emerald-200 rounded-full flex items-center justify-center group-hover:scale-110 transition-transform duration-300">
+                  <FiMapPin className="h-8 w-8 text-emerald-600" />
+                </div>
               </div>
             </div>
           </div>
 
-          {/* Filters */}
-          <div className="bg-white rounded-lg shadow-md p-6">
-            <div className="space-y-4">
-              <div className="flex items-center justify-between">
-                <div className="flex items-center space-x-2">
-                  <FiFilter className="h-5 w-5" />
-                  <h2 className="text-lg font-medium">Filters</h2>
+          {/* Enhanced Filters */}
+          <div className="bg-white rounded-2xl shadow-xl p-8 border border-gray-100">
+            <div className="space-y-6">
+              <div className="flex items-center justify-between">              <div className="flex items-center space-x-3">
+                <div className="w-10 h-10 bg-gradient-to-br from-green-500 to-emerald-600 rounded-full flex items-center justify-center">
+                  <FiFilter className="h-5 w-5 text-white" />
                 </div>
+                <div>
+                  <h2 className="text-2xl font-bold text-gray-800">Smart Filters</h2>
+                  <p className="text-sm text-gray-600">Refine your outbreak analysis</p>
+                </div>
+              </div>
                 <button
                   onClick={clearFilters}
-                  className="flex items-center space-x-1 px-3 py-1 text-sm border border-gray-300 rounded-md hover:bg-gray-50 transition-colors"
+                  className="flex items-center space-x-2 px-4 py-2 text-sm bg-gradient-to-r from-gray-100 to-gray-200 hover:from-gray-200 hover:to-gray-300 text-gray-700 rounded-xl transition-all duration-300 hover:scale-105 shadow-md hover:shadow-lg"
                   title="Clear all filters"
                 >
                   <FiRefreshCw className="h-4 w-4" />
-                  <span>Clear</span>
+                  <span className="font-medium">Clear All</span>
                 </button>
               </div>
 
@@ -207,7 +276,7 @@ const Outbreak = () => {
                   <select
                     value={diseaseFilter}
                     onChange={(e) => setDiseaseFilter(e.target.value)}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-green-500"
+                    className="w-full px-3 py-2 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-green-500 transition-all duration-200"
                   >
                     <option value="">All diseases</option>
                     {uniqueDiseasesArray.map((disease) => (
@@ -223,7 +292,7 @@ const Outbreak = () => {
                   <select
                     value={cropFilter}
                     onChange={(e) => setCropFilter(e.target.value)}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-green-500"
+                    className="w-full px-3 py-2 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-green-500 transition-all duration-200"
                   >
                     <option value="">All crops</option>
                     {uniqueCropsArray.map((crop) => (
@@ -239,7 +308,7 @@ const Outbreak = () => {
                   <select
                     value={severityFilter}
                     onChange={(e) => setSeverityFilter(e.target.value)}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-green-500"
+                    className="w-full px-3 py-2 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-green-500 transition-all duration-200"
                   >
                     <option value="">All severities</option>
                     {severityOptions.map((severity) => (
@@ -255,7 +324,7 @@ const Outbreak = () => {
                   <select
                     value={climateFilter}
                     onChange={(e) => setClimateFilter(e.target.value)}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-green-500"
+                    className="w-full px-3 py-2 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-green-500 transition-all duration-200"
                   >
                     <option value="">All conditions</option>
                     {uniqueClimateConditions.map((condition) => (
@@ -272,7 +341,7 @@ const Outbreak = () => {
                     type="date"
                     value={dateFilter}
                     onChange={(e) => setDateFilter(e.target.value)}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-green-500"
+                    className="w-full px-3 py-2 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-green-500 transition-all duration-200"
                   />
                 </div>
               </div>
@@ -290,12 +359,12 @@ const Outbreak = () => {
               </div>
             ) : filteredData.length === 0 ? (
               <div className="h-96 flex items-center justify-center">
-                <div className="max-w-sm mx-auto text-center p-6 bg-blue-50 rounded-lg border border-blue-200">
-                  <div className="text-blue-500 mb-2">
+                <div className="max-w-sm mx-auto text-center p-6 bg-green-50 rounded-lg border border-green-200">
+                  <div className="text-green-500 mb-2">
                     <FiAlertTriangle className="h-8 w-8 mx-auto" />
                   </div>
-                  <h3 className="text-lg font-medium text-blue-900 mb-2">No Data Found!</h3>
-                  <p className="text-blue-700">
+                  <h3 className="text-lg font-medium text-green-900 mb-2">No Data Found!</h3>
+                  <p className="text-green-700">
                     No outbreak data matches your current filters. Try adjusting the filters above.
                   </p>
                 </div>
@@ -342,7 +411,7 @@ const Outbreak = () => {
                                 <div className="grid grid-cols-2 gap-2">
                                   <div>
                                     <p className="text-xs font-medium text-gray-500">Disease</p>
-                                    <span className="inline-block px-2 py-1 text-xs font-medium bg-blue-100 text-blue-800 rounded-full border border-blue-200">
+                                    <span className="inline-block px-2 py-1 text-xs font-medium bg-green-100 text-green-800 rounded-full border border-green-200">
                                       {location.Disease}
                                     </span>
                                   </div>
@@ -377,21 +446,21 @@ const Outbreak = () => {
                                     <div>
                                       <p className="text-sm font-medium text-gray-700 mb-2">Climate Conditions</p>
                                       <div className="grid grid-cols-2 gap-2 text-xs">
-                                        <div className="bg-blue-50 p-2 rounded">
-                                          <p className="font-medium text-blue-700">Temperature</p>
-                                          <p className="text-blue-600">{location.Climate.temperature}°C</p>
+                                        <div className="bg-emerald-50 p-2 rounded">
+                                          <p className="font-medium text-emerald-700">Temperature</p>
+                                          <p className="text-emerald-600">{location.Climate.temperature}°C</p>
                                         </div>
                                         <div className="bg-green-50 p-2 rounded">
                                           <p className="font-medium text-green-700">Humidity</p>
                                           <p className="text-green-600">{location.Climate.humidity}%</p>
                                         </div>
-                                        <div className="bg-purple-50 p-2 rounded">
-                                          <p className="font-medium text-purple-700">Rainfall</p>
-                                          <p className="text-purple-600">{location.Climate.rainfall}mm</p>
+                                        <div className="bg-teal-50 p-2 rounded">
+                                          <p className="font-medium text-teal-700">Rainfall</p>
+                                          <p className="text-teal-600">{location.Climate.rainfall}mm</p>
                                         </div>
-                                        <div className="bg-orange-50 p-2 rounded">
-                                          <p className="font-medium text-orange-700">Conditions</p>
-                                          <p className="text-orange-600 text-xs">{location.Climate.conditions}</p>
+                                        <div className="bg-green-100 p-2 rounded">
+                                          <p className="font-medium text-green-700">Conditions</p>
+                                          <p className="text-green-600 text-xs">{location.Climate.conditions}</p>
                                         </div>
                                       </div>
                                     </div>
@@ -431,7 +500,7 @@ const Outbreak = () => {
                           <Popup>
                             <div className="p-3 min-w-[280px]">
                               <div className="space-y-3">
-                                <h3 className="text-lg font-semibold text-orange-700">Potential Spread Zone</h3>
+                                <h3 className="text-lg font-semibold text-emerald-700">Potential Spread Zone</h3>
                                 <hr />
                                 <p className="text-sm text-gray-600">
                                   {location.Description}
@@ -440,7 +509,7 @@ const Outbreak = () => {
                                 <div className="grid grid-cols-2 gap-2">
                                   <div>
                                     <p className="text-xs font-medium text-gray-500">Source Disease</p>
-                                    <span className="inline-block px-2 py-1 text-xs font-medium bg-orange-100 text-orange-800 rounded-full border border-orange-200">
+                                    <span className="inline-block px-2 py-1 text-xs font-medium bg-emerald-100 text-emerald-800 rounded-full border border-emerald-200">
                                       {location.Disease}
                                     </span>
                                   </div>
@@ -467,21 +536,21 @@ const Outbreak = () => {
                                     <div>
                                       <p className="text-sm font-medium text-gray-700 mb-2">Contributing Climate Factors</p>
                                       <div className="grid grid-cols-2 gap-2 text-xs">
-                                        <div className="bg-blue-50 p-2 rounded">
-                                          <p className="font-medium text-blue-700">Temperature</p>
-                                          <p className="text-blue-600">{location.Climate.temperature}°C</p>
+                                        <div className="bg-emerald-50 p-2 rounded">
+                                          <p className="font-medium text-emerald-700">Temperature</p>
+                                          <p className="text-emerald-600">{location.Climate.temperature}°C</p>
                                         </div>
                                         <div className="bg-green-50 p-2 rounded">
                                           <p className="font-medium text-green-700">Humidity</p>
                                           <p className="text-green-600">{location.Climate.humidity}%</p>
                                         </div>
-                                        <div className="bg-purple-50 p-2 rounded">
-                                          <p className="font-medium text-purple-700">Rainfall</p>
-                                          <p className="text-purple-600">{location.Climate.rainfall}mm</p>
+                                        <div className="bg-teal-50 p-2 rounded">
+                                          <p className="font-medium text-teal-700">Rainfall</p>
+                                          <p className="text-teal-600">{location.Climate.rainfall}mm</p>
                                         </div>
-                                        <div className="bg-orange-50 p-2 rounded">
-                                          <p className="font-medium text-orange-700">Conditions</p>
-                                          <p className="text-orange-600 text-xs">{location.Climate.conditions}</p>
+                                        <div className="bg-green-100 p-2 rounded">
+                                          <p className="font-medium text-green-700">Conditions</p>
+                                          <p className="text-green-600 text-xs">{location.Climate.conditions}</p>
                                         </div>
                                       </div>
                                     </div>
@@ -527,7 +596,7 @@ const Outbreak = () => {
                     <div key={outbreak.id} className="grid grid-cols-8 gap-2 p-3 border-b border-gray-200 text-sm">
                       <div className="font-medium">{outbreak.Location}</div>
                       <div>
-                        <span className="inline-block px-2 py-1 text-xs font-medium bg-blue-100 text-blue-800 rounded-full border border-blue-200">
+                        <span className="inline-block px-2 py-1 text-xs font-medium bg-green-100 text-green-800 rounded-full border border-green-200">
                           {outbreak.Disease}
                         </span>
                       </div>
@@ -558,8 +627,8 @@ const Outbreak = () => {
                   </p>
                 )}
                 {spreadZones.length > 0 && (
-                  <div className="mt-3 p-3 bg-yellow-50 rounded-md border border-yellow-200">
-                    <p className="text-sm text-yellow-800">
+                  <div className="mt-3 p-3 bg-emerald-50 rounded-md border border-emerald-200">
+                    <p className="text-sm text-emerald-800">
                       <strong>{spreadZones.length}</strong> potential spread zones identified based on climate conditions
                     </p>
                   </div>

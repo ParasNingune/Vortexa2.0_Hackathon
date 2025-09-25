@@ -236,7 +236,7 @@ const formatDate = (dateString) => {
 // Main function to fetch and process outbreak data from CSV
 export const fetchOutbreakDataFromCSV = async () => {
   try {
-    const csvData = await parseCSVData('/climate_info.csv');
+    const csvData = await parseCSVData('./climate_info.csv');
     const transformedData = transformToOutbreakData(csvData);
     return transformedData;
   } catch (error) {

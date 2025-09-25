@@ -8,6 +8,7 @@ import io
 import base64
 import tensorflow as tf
 from tensorflow import keras
+import cv2
 
 app = Flask(__name__)
 CORS(app, origins=['http://localhost:5173', 'http://localhost:5174', 'http://localhost:5175'])
@@ -20,79 +21,115 @@ if not os.path.exists(UPLOAD_FOLDER):
 app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
 app.config['MAX_CONTENT_LENGTH'] = 16 * 1024 * 1024  # 16MB max file size
 
-# Disease class names
-CLASS_NAMES = [
-    'Apple___Apple_scab', 'Apple___Black_rot', 'Apple___Cedar_apple_rust', 'Apple___healthy',
-    'Cherry_(including_sour)___healthy', 'Cherry_(including_sour)___Powdery_mildew',
-    'Corn_(maize)___Cercospora_leaf_spot Gray_leaf_spot', 'Corn_(maize)___Common_rust_',
-    'Corn_(maize)___healthy', 'Corn_(maize)___Northern_Leaf_Blight', 'Grape___Black_rot',
-    'Grape___Esca_(Black_Measles)', 'Grape___healthy', 'Grape___Leaf_blight_(Isariopsis_Leaf_Spot)',
-    'Orange___Haunglongbing_(Citrus_greening)', 'Peach___Bacterial_spot', 'Peach___healthy',
-    'Pepper,_bell___Bacterial_spot', 'Pepper,_bell___healthy', 'Potato___Early_blight',
-    'Potato___healthy', 'Potato___Late_blight', 'Raspberry___healthy', 'Soybean___healthy',
-    'Squash___Powdery_mildew', 'Strawberry___healthy', 'Strawberry___Leaf_scorch',
-    'Tomato___Bacterial_spot', 'Tomato___Early_blight', 'Tomato___healthy', 'Tomato___Late_blight',
-    'Tomato___Leaf_Mold', 'Tomato___Septoria_leaf_spot', 'Tomato___Spider_mites Two-spotted_spider_mite',
-    'Tomato___Target_Spot', 'Tomato___Tomato_mosaic_virus', 'Tomato___Tomato_Yellow_Leaf_Curl_Virus'
-]
+# Disease class names - will be loaded from validation dataset
+class_names = []
+
+def load_class_names():
+    """Load class names from validation dataset as shown in notebook"""
+    global class_names
+    try:
+        # Try to load validation dataset to get class names
+        if os.path.exists('./Dataset/valid'):
+            validation_set = tf.keras.utils.image_dataset_from_directory(
+                './Dataset/valid',
+                labels="inferred",
+                label_mode="categorical",
+                class_names=None,
+                color_mode="rgb",
+                batch_size=32,
+                image_size=(128, 128),
+                shuffle=True,
+                seed=None,
+                validation_split=None,
+                subset=None,
+                interpolation="bilinear",
+                follow_links=False,
+                crop_to_aspect_ratio=False
+            )
+            class_names = validation_set.class_names
+            print(f"✅ Loaded {len(class_names)} class names from validation dataset")
+            print("Class names:", class_names)
+            return True
+        else:
+            # Fallback to hardcoded class names if dataset not available
+            class_names = [
+                'Apple___Apple_scab', 'Apple___Black_rot', 'Apple___Cedar_apple_rust', 
+                'Apple___healthy', 'Blueberry___healthy', 'Cherry_(including_sour)___Powdery_mildew', 
+                'Cherry_(including_sour)___healthy', 'Corn_(maize)___Cercospora_leaf_spot Gray_leaf_spot', 
+                'Corn_(maize)___Common_rust_', 'Corn_(maize)___Northern_Leaf_Blight', 'Corn_(maize)___healthy', 
+                'Grape___Black_rot', 'Grape___Esca_(Black_Measles)', 'Grape___Leaf_blight_(Isariopsis_Leaf_Spot)', 
+                'Grape___healthy', 'Orange___Haunglongbing_(Citrus_greening)', 'Peach___Bacterial_spot', 
+                'Peach___healthy', 'Pepper,_bell___Bacterial_spot', 'Pepper,_bell___healthy', 
+                'Potato___Early_blight', 'Potato___Late_blight', 'Potato___healthy', 'Raspberry___healthy', 'Soybean___healthy', 
+                'Squash___Powdery_mildew', 'Strawberry___Leaf_scorch', 'Strawberry___healthy', 'Tomato___Bacterial_spot', 
+                'Tomato___Early_blight', 'Tomato___Late_blight', 'Tomato___Leaf_Mold', 'Tomato___Septoria_leaf_spot', 
+                'Tomato___Spider_mites Two-spotted_spider_mite', 'Tomato___Target_Spot', 'Tomato___Tomato_Yellow_Leaf_Curl_Virus', 
+                'Tomato___Tomato_mosaic_virus', 'Tomato___healthy'
+            ]
+            print("⚠️ Using fallback hardcoded class names")
+            return True
+    except Exception as e:
+        print(f"❌ Error loading class names: {str(e)}")
+        return False
 
 # Load the model once at startup
-model = None
-model_path = 'trained_plant_disease_model.pkl'
+cnn = None
+model_path = 'trained_plant_disease_model.keras'
 
-def load_pkl_model():
-    """Load the pickled model"""
-    global model
+def load_keras_model():
+    """Load the Keras model"""
+    global cnn
     try:
-        # First try loading as a pickle file
-        with open(model_path, 'rb') as f:
-            model = pickle.load(f)
-        print(f"✅ Model loaded successfully from {model_path}")
+        # Load the Keras model as shown in the notebook
+        cnn = tf.keras.models.load_model(model_path)
+        print(f"✅ Keras model loaded successfully from {model_path}")
         return True
-    except Exception as pickle_error:
-        print(f"❌ Error loading as pickle: {str(pickle_error)}")
+    except Exception as e:
+        print(f"❌ Error loading Keras model: {str(e)}")
         
-        # If pickle fails, try loading as Keras model
+        # Try alternative model paths
         try:
-            # Try different Keras loading methods
-            model_h5_path = model_path.replace('.pkl', '.h5')
-            if os.path.exists(model_h5_path):
-                model = keras.models.load_model(model_h5_path)
-                print(f"✅ Keras model loaded from {model_h5_path}")
+            alt_path = 'trained_plant_disease_model-1.pkl'
+            if os.path.exists(alt_path):
+                with open(alt_path, 'rb') as f:
+                    cnn = pickle.load(f)
+                print(f"✅ Fallback: Model loaded from {alt_path}")
                 return True
-            
-            # Try loading as SavedModel format
-            model_dir = model_path.replace('.pkl', '_saved_model')
-            if os.path.exists(model_dir):
-                model = keras.models.load_model(model_dir)
-                print(f"✅ SavedModel loaded from {model_dir}")
-                return True
-                
-            print(f"❌ Could not load model in any format")
-            return False
-            
-        except Exception as keras_error:
-            print(f"❌ Error loading as Keras model: {str(keras_error)}")
-            return False
+        except Exception as fallback_error:
+            print(f"❌ Fallback also failed: {str(fallback_error)}")
+        
+        return False
 
 def preprocess_image(image_file, target_size=(128, 128)):
-    """Preprocess image for model prediction"""
+    """Preprocess image for model prediction - following the notebook approach"""
     try:
-        # Open and preprocess image
-        image = Image.open(image_file)
-        image = image.convert('RGB')
-        image = image.resize(target_size)
+        # Save uploaded file temporarily
+        temp_path = os.path.join(app.config['UPLOAD_FOLDER'], 'temp_image.jpg')
+        image_file.save(temp_path)
         
-        # Convert to numpy array and normalize
-        image_array = np.array(image)
-        image_array = image_array / 255.0
+        # Load and preprocess image exactly as in the notebook
+        # Step 1: Load with cv2 and convert color space
+        img = cv2.imread(temp_path)
+        img = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
         
-        # Add batch dimension
-        image_array = np.expand_dims(image_array, axis=0)
+        # Step 2: Load with tf.keras preprocessing for model input
+        image = tf.keras.preprocessing.image.load_img(temp_path, target_size=target_size)
+        input_arr = tf.keras.preprocessing.image.img_to_array(image)
+        input_arr = np.array([input_arr])  # Convert single image to a batch
         
-        return image_array
+        # Clean up temporary file
+        if os.path.exists(temp_path):
+            os.remove(temp_path)
+        
+        return input_arr, img  # Return both processed array and original image for display
     except Exception as e:
+        # Clean up temporary file in case of error
+        temp_path = os.path.join(app.config['UPLOAD_FOLDER'], 'temp_image.jpg')
+        if os.path.exists(temp_path):
+            os.remove(temp_path)
         raise Exception(f"Error preprocessing image: {str(e)}")
+
+
 
 def parse_class_name(class_name):
     """Parse class name to get crop and disease"""
@@ -171,19 +208,28 @@ def health_check():
     return jsonify({
         'success': True,
         'message': 'Plant Disease Detection Python API is running',
-        'model_loaded': model is not None,
+        'model_loaded': cnn is not None,
+        'class_names_loaded': len(class_names) > 0,
+        'num_classes': len(class_names),
         'timestamp': str(np.datetime64('now'))
     })
 
 @app.route('/api/predict', methods=['POST'])
 def predict_disease():
-    """Predict plant disease from uploaded image"""
+    """Predict plant disease from uploaded image - following notebook approach"""
     try:
         # Check if model is loaded
-        if model is None:
+        if cnn is None:
             return jsonify({
                 'success': False,
                 'error': 'Model not loaded'
+            }), 500
+        
+        # Check if class names are loaded
+        if len(class_names) == 0:
+            return jsonify({
+                'success': False,
+                'error': 'Class names not loaded'
             }), 500
         
         # Check if image file is present
@@ -202,26 +248,26 @@ def predict_disease():
         
         # Preprocess image
         try:
-            processed_image = preprocess_image(file)
+            input_arr, img = preprocess_image(file)
         except Exception as e:
             return jsonify({
                 'success': False,
                 'error': f'Image preprocessing failed: {str(e)}'
             }), 400
         
-        # Make prediction
+        # Make prediction exactly as in notebook
         try:
-            predictions = model.predict(processed_image)
-            predicted_class_index = np.argmax(predictions[0])
-            confidence = float(predictions[0][predicted_class_index])
+            predictions = cnn.predict(input_arr)
+            result_index = np.argmax(predictions)  # Return index of max element
+            confidence = float(predictions[0][result_index])
             
-            # Get class name
-            predicted_class = CLASS_NAMES[predicted_class_index] if predicted_class_index < len(CLASS_NAMES) else 'Unknown'
+            # Get predicted class name
+            model_prediction = class_names[result_index]
             
-            # Parse class name
-            crop, disease = parse_class_name(predicted_class)
+            # Parse class name to get crop and disease
+            crop, disease = parse_class_name(model_prediction)
             
-            # Determine severity
+            # Determine severity based on confidence
             severity = 'Low'
             if confidence > 0.8:
                 if 'healthy' not in disease.lower():
@@ -238,7 +284,7 @@ def predict_disease():
             top_indices = np.argsort(predictions[0])[::-1][:5]
             all_predictions = []
             for idx in top_indices:
-                class_name = CLASS_NAMES[idx] if idx < len(CLASS_NAMES) else f'Class_{idx}'
+                class_name = class_names[idx] if idx < len(class_names) else f'Class_{idx}'
                 all_predictions.append({
                     'class': class_name.replace('___', ' - ').replace('_', ' '),
                     'confidence': round(float(predictions[0][idx]) * 100, 2)
@@ -252,7 +298,8 @@ def predict_disease():
                 'confidence': round(confidence * 100, 2),
                 'recommendations': recommendations,
                 'all_predictions': all_predictions,
-                'className': predicted_class
+                'className': model_prediction,
+                'predicted_index': int(result_index)
             }
             
             return jsonify(result)
@@ -273,9 +320,15 @@ if __name__ == '__main__':
     print("🌱 Starting Plant Disease Detection API...")
     
     # Load model at startup
-    if not load_pkl_model():
+    if not load_keras_model():
         print("❌ Failed to load model. Exiting...")
         exit(1)
     
+    # Load class names
+    if not load_class_names():
+        print("❌ Failed to load class names. Exiting...")
+        exit(1)
+    
     print("🚀 Server starting on http://localhost:8000")
+    print(f"📊 Model loaded with {len(class_names)} classes")
     app.run(host='0.0.0.0', port=8000, debug=True)
