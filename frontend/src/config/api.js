@@ -1,5 +1,5 @@
 // API Configuration
-const API_BASE_URL = import.meta.env.VITE_API_URL || 'https://vortexa2-0-hackathon.onrender.com';
+const API_BASE_URL = 'https://vortexa2-0-hackathon.onrender.com';
 
 // API Endpoints
 export const API_ENDPOINTS = {

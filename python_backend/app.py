@@ -18,8 +18,8 @@ allowed_origins = [
     'http://localhost:5174', 
     'http://localhost:5175',
     'http://localhost:3000',
-    'https://plantguard-ai.netlify.app',      # Add your actual Netlify URL here
-    'https://plantguard-ai.vercel.app',       # Add your actual Vercel URL here
+    'https://vortexa2-0-hackathon.onrender.com',      # Add your actual Netlify URL here
+    'vortexa2-0-hackathon-m57z6iaz7-paras-projects-c7b4aa2f.vercel.app',       # Add your actual Vercel URL here
     '*'  # Allow all origins for now - remove in production and specify exact domains
 ]
 
