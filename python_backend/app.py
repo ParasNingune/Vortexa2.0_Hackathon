@@ -11,7 +11,18 @@ from tensorflow import keras
 import cv2
 
 app = Flask(__name__)
-CORS(app, origins=['http://localhost:5173', 'http://localhost:5174', 'http://localhost:5175'])
+
+# Configure CORS for both development and production
+allowed_origins = [
+    'http://localhost:5173', 
+    'http://localhost:5174', 
+    'http://localhost:5175',
+    'http://localhost:3000',
+    'https://your-frontend-app.netlify.app',  # Replace with your actual frontend URL
+    'https://your-frontend-app.vercel.app',   # Replace with your actual frontend URL
+]
+
+CORS(app, origins=allowed_origins)
 
 # Configure upload folder
 UPLOAD_FOLDER = 'uploads'
@@ -316,19 +327,27 @@ def predict_disease():
             'error': f'Server error: {str(e)}'
         }), 500
 
-if __name__ == '__main__':
-    print("🌱 Starting Plant Disease Detection API...")
+# Initialize the application
+def create_app():
+    """Application factory pattern for deployment"""
+    print("🌱 Initializing Plant Disease Detection API...")
     
     # Load model at startup
     if not load_keras_model():
         print("❌ Failed to load model. Exiting...")
-        exit(1)
+        return None
     
     # Load class names
     if not load_class_names():
         print("❌ Failed to load class names. Exiting...")
-        exit(1)
+        return None
     
-    print("🚀 Server starting on http://localhost:8000")
     print(f"📊 Model loaded with {len(class_names)} classes")
-    app.run(host='0.0.0.0', port=8000, debug=True)
+    return app
+
+# Initialize app for production
+create_app()
+
+if __name__ == '__main__':
+    print("🚀 Server starting on http://localhost:8000")
+    app.run(host='0.0.0.0', port=int(os.environ.get('PORT', 8000)), debug=False)

@@ -145,8 +145,8 @@ PlantGuard AI is a comprehensive plant disease detection system that combines cu
    ```
    Application will open on `http://localhost:5173`
 
-## 🏗️ Project Structure
 
+## 🏗️ Project Structure
 ```
 Vortexa2.0_Hackathon/
 ├── frontend/                   # React.js frontend application
