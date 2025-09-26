@@ -214,6 +214,22 @@ def generate_recommendations(crop, disease, severity):
     
     return recommendations
 
+@app.route('/', methods=['GET'])
+def root():
+    """Root endpoint - API information"""
+    return jsonify({
+        'success': True,
+        'message': 'Plant Disease Detection API',
+        'version': '1.0.0',
+        'endpoints': {
+            'health': '/api/health',
+            'predict': '/api/predict'
+        },
+        'status': 'online',
+        'model_loaded': cnn is not None,
+        'num_classes': len(class_names) if class_names else 0
+    })
+
 @app.route('/api/health', methods=['GET'])
 def health_check():
     """Health check endpoint"""
