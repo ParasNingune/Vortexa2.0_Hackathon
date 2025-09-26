@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import { useToast } from "./Toast.jsx";
+import { API_ENDPOINTS } from "../config/api.js";
 
 export default function Predict() {
   const [file, setFile] = useState(null);
@@ -69,7 +70,7 @@ export default function Predict() {
       const formData = new FormData();
       formData.append('image', file);
 
-      const response = await fetch('http://localhost:8000/api/predict', {
+      const response = await fetch(API_ENDPOINTS.predict, {
         method: 'POST',
         body: formData,
       });

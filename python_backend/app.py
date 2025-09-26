@@ -18,8 +18,9 @@ allowed_origins = [
     'http://localhost:5174', 
     'http://localhost:5175',
     'http://localhost:3000',
-    'https://your-frontend-app.netlify.app',  # Replace with your actual frontend URL
-    'https://your-frontend-app.vercel.app',   # Replace with your actual frontend URL
+    'https://plantguard-ai.netlify.app',      # Add your actual Netlify URL here
+    'https://plantguard-ai.vercel.app',       # Add your actual Vercel URL here
+    '*'  # Allow all origins for now - remove in production and specify exact domains
 ]
 
 CORS(app, origins=allowed_origins)
